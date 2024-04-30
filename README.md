@@ -1,11 +1,15 @@
 
-# ST7735S Driver for MicroPython
+# RM67162 Driver for MicroPython
 
-This driver is a modified version of [russhughes' st7789_mpy driver.](https://github.com/russhughes/st7789_mpy/tree/master/st7789) All credits goes to russhughes for his amazing drivers!
+This driver is a modified version of [nspsck st7735s_WeAct_Studio_TFT_port driver](https://github.com/nspsck/st7735s_WeAct_Studio_TFT_port) All credits goes to him for his amazing drivers!
 
-I modified the original driver to specifically support the st7735s tft display sold by WeAct Studio. This display probably uses a pull-up resistor for the backlight. If your display has a pull-up resisotr for the backlight as well, and it happens to use st7735, ili9341, ili9342 and other common controllers, you can try your luck too. For that you have to set the `reversed_backlight` to `True`. If the displayed colors are inverted, try set `inversion` to `False` (or `True`, well, default should be `True`). 
+I modified the driver to specifically support displays with RM67162 controllers that only have SPI connection. For RM67162 Displays with QSPI (quad SPI) check out this driver:[RM67162_Micropython_QSPI](https://github.com/nspsck/RM67162_Micropython_QSPI)
 
-This driver supports all the features the original has. Some performance enhancement and new features has been done. Please read [Updates](#updates).
+This display sets the backlight via SPI but for the driver to work you need to assing a random unused pin for backlight. The reverse_backlight option does therefore nothing.
+
+This driver supports all the features the original has. Please read [Updates](#updates).
+
+# Original Documentation:
 
 ## Side note:
 - The st7735 display from WeAct Studio has a 132x162 st7735s controller, however, the displays resolution is 128x160, which leads to the result, that the visible drawing area is from top left (2, 1) to bottom right (129, 160) in x-th pixel. For example: `tft.pixel(2, 0)` shows nothing on the display, but it's registered in the controllers frame memory. `tft.pixel(2, 1)` light up the the most top left pixel. This is fixed using the custom rotation table, for that automatically to take effect, you still have to set the resolution to 132x162, but use it as a 128x160 display. This result the `tft.height()` and `tft.width()` yelds `160` and `128` respectively. Please keep that in Mind.
