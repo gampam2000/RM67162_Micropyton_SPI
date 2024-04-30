@@ -1,5 +1,5 @@
 
-# RM67162 Driver for MicroPython
+# RM67162 SPI Driver for MicroPython
 
 This driver is a modified version of [nspsck st7735s_WeAct_Studio_TFT_port driver](https://github.com/nspsck/st7735s_WeAct_Studio_TFT_port) All credits goes to him for his amazing drivers!
 
