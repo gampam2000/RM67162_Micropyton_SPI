@@ -6,7 +6,7 @@ extern "C" {
 #endif
 
 // color modes
-#define COLOR_MODE_65K      0x50
+#define COLOR_MODE_65K      0x50 
 #define COLOR_MODE_262K     0x60
 #define COLOR_MODE_12BIT    0x03
 #define COLOR_MODE_16BIT    0x05
@@ -14,30 +14,34 @@ extern "C" {
 #define COLOR_MODE_16M      0x07
 
 // commands
-#define ST7789_NOP     0x00
-#define ST7789_SWRESET 0x01
-#define ST7789_RDDID   0x04
-#define ST7789_RDDST   0x09
+#define ST7789_NOP     0x00 // This command is empty command
+#define ST7789_SWRESET 0x01 // Software reset registers (the built-in frame buffer is not affected)
+#define ST7789_RDDID   0x04 // Read 24-bit display ID
+#define ST7789_RDDST   0x09 // Read display status
 
-#define ST7789_SLPIN   0x10
-#define ST7789_SLPOUT  0x11
-#define ST7789_PTLON   0x12
-#define ST7789_NORON   0x13
+#define ST7789_SLPIN   0x10 // Go into sleep mode (DC/DC, oscillator, scanning stopped, but memory keeps content)
+#define ST7789_SLPOUT  0x11 // Exit sleep mode
+#define ST7789_PTLON   0x12 // Turns on partial display mode
+#define ST7789_NORON   0x13 // Turns on normal display mode
 
-#define ST7789_INVOFF  0x21
-#define ST7789_INVON   0x20
-#define ST7789_DISPOFF 0x28
-#define ST7789_DISPON  0x29
-#define ST7789_CASET   0x2A
-#define ST7789_RASET   0x2B
-#define ST7789_RAMWR   0x2C
-#define ST7789_RAMRD   0x2E
+#define ST7789_INVOFF  0x20 // Recover from display inversion
+#define ST7789_INVON   0x21 // Go into display inversion mode
+#define ST7789_DISPOFF 0x28 // Display off (disable frame buffer output)
+#define ST7789_DISPON  0x29 // Display on (enable frame buffer output)
+#define ST7789_CASET   0x2A // Set column address
+#define ST7789_RASET   0x2B // Set row address
+#define ST7789_RAMWR   0x2C // Write frame memory
+#define ST7789_RAMRD   0x2E // Read frame memory
 
-#define ST7789_PTLAR   0x30
-#define ST7789_VSCRDEF 0x33
-#define ST7789_COLMOD  0x3A
-#define ST7789_MADCTL  0x36
-#define ST7789_VSCSAD  0x37
+#define ST7789_PTLAR   0x30 // Define the partial area
+#define ST7789_VSCRDEF 0x33 // Vertical scrolling definition
+#define ST7789_COLMOD  0x3A // Defines the format of RGB picture data
+#define ST7789_MADCTL  0x36 // Memory data access control
+#define ST7789_VSCSAD  0x37 // Vertical scroll start address
+
+//added for rm67162 support
+#define LCD_CMD_WRDISBV      0x51 // Write display brightness
+#define LCD_CMD_RDDISBV      0x52 // Read display brightness value
 
 #define ST7789_MADCTL_MY  0x80  // Page Address Order
 #define ST7789_MADCTL_MX  0x40  // Column Address Order

@@ -91,21 +91,22 @@
         mp_hal_pin_write(self->reset, 1);   \
     }
 
-#define backlight_on() {                        \
-    if (self->reversed_backlight) {             \
-        mp_hal_pin_write(self->backlight, 0);   \
-    } else {                                    \
-        mp_hal_pin_write(self->backlight, 1);   \
-    }                                           \
-}
+//modified for rm67162 display
+#define backlight_on()                                      \
+    {                                                       \
+        mp_hal_pin_write(self->backlight, 1);               \
+        write_cmd(self, LCD_CMD_WRDISBV, (uint8_t[]) {      \
+            0XFF                                            \
+        }, 1);                                              \
+    }            
 
-#define backlight_off() {                       \
-    if (self->reversed_backlight) {             \
-        mp_hal_pin_write(self->backlight, 1);   \
-    } else {                                    \
-        mp_hal_pin_write(self->backlight, 0);   \
-    }                                           \
-}
+#define backlight_off()                                     \
+    {                                                       \
+        mp_hal_pin_write(self->backlight, 0);               \
+        write_cmd(self, LCD_CMD_WRDISBV, (uint8_t[]) {      \
+            0X00                                            \
+        }, 1);                                              \
+    }                                                       
 
 //
 // Default st7789 and st7735 display orientation tables
@@ -114,13 +115,21 @@
 //
 
 // { madctl, width, height, colstart, rowstart }
+// Added for rm67162 240x536 display
+st7789_rotation_t ORIENTATIONS_240x536[4] = {
+    {0x00, 240, 536, 0, 0},
+    {0x60, 536, 240, 0, 0},
+    {0xc0, 240, 536, 0, 0},
+    {0xa0, 536, 240, 0, 0}
+};    
+
+// { madctl, width, height, colstart, rowstart }
 st7789_rotation_t ORIENTATIONS_128x160_WEACT_STUDIO[4] = {
     {0x00, 128, 160, 2, 1},
     {0x60, 160, 128, 1, 2},
     {0xc0, 128, 160, 2, 1},
     {0xa0, 160, 128, 1, 2}
 };
-
 
 st7789_rotation_t ORIENTATIONS_240x320[4] = {
     {0x00, 240, 320, 0, 0},
@@ -412,6 +421,26 @@ STATIC mp_obj_t st7789_ST7789_inversion_mode(mp_obj_t self_in, mp_obj_t value) {
     return mp_const_none;
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_2(st7789_ST7789_inversion_mode_obj, st7789_ST7789_inversion_mode);
+
+//added for RM67162 display
+STATIC mp_obj_t st7789_ST7789_brightness(mp_obj_t self_in, mp_obj_t brightness_in)
+{
+    st7789_ST7789_obj_t *self = MP_OBJ_TO_PTR(self_in);
+    mp_int_t brightness = mp_obj_get_int(brightness_in);
+
+    if (brightness > 100) {
+        brightness = 100;
+    } else if (brightness < 0) {
+        brightness = 0;
+    }
+
+    write_cmd(self, LCD_CMD_WRDISBV, (uint8_t[]) {
+            (brightness * 255 / 100) & 0xFF
+    }, 1);
+
+    return mp_const_none;
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_2(st7789_ST7789_brightness_obj, st7789_ST7789_brightness);
 
 STATIC void fill_rect(st7789_ST7789_obj_t *self, int x, int y, int w, int h, uint16_t color) {
     uint16_t right = x + w - 1;
@@ -2514,6 +2543,7 @@ STATIC const mp_rom_map_elem_t st7789_ST7789_locals_dict_table[] = {
     {MP_ROM_QSTR(MP_QSTR_hard_reset), MP_ROM_PTR(&st7789_ST7789_hard_reset_obj)},
     {MP_ROM_QSTR(MP_QSTR_soft_reset), MP_ROM_PTR(&st7789_ST7789_soft_reset_obj)},
     {MP_ROM_QSTR(MP_QSTR_sleep_mode), MP_ROM_PTR(&st7789_ST7789_sleep_mode_obj)},
+    {MP_ROM_QSTR(MP_QSTR_brightness), MP_ROM_PTR(&st7789_ST7789_brightness_obj)},
     {MP_ROM_QSTR(MP_QSTR_inversion_mode), MP_ROM_PTR(&st7789_ST7789_inversion_mode_obj)},
     {MP_ROM_QSTR(MP_QSTR_map_bitarray_to_rgb565), MP_ROM_PTR(&st7789_map_bitarray_to_rgb565_obj)},
     {MP_ROM_QSTR(MP_QSTR_init), MP_ROM_PTR(&st7789_ST7789_init_obj)},
