@@ -5,9 +5,10 @@ This driver is a modified version of [nspsck st7735s_WeAct_Studio_TFT_port drive
 
 I modified the driver to specifically support displays with RM67162 controllers that only have SPI connection. For RM67162 Displays with QSPI (quad SPI) check out this driver:[RM67162_Micropython_QSPI](https://github.com/nspsck/RM67162_Micropython_QSPI)
 
-So far I have only tested it on ESP32-S3 variants. I use the hardware SPI 2 for my project. 
+So far I have only tested it on ESP32-S3 variants. I use the hardware SPI 2 for my project.
+
 ```
-ESP32S3        -->    RM67162 SPI (in some displays this is refered as SPI 4 Wire)
+ESP32S3        -->    RM67162 SPI (in some displays documentation/datasheets this is refered as SPI 4 Wire)
 3V3            -->    VCC,VBAT
 GND            -->    GND
 mosi=Pin40     -->    DIN
