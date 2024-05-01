@@ -29,7 +29,12 @@ This driver supports all the features the [original](#original-documentation) ha
 
 ## How to use:
 
+You have to compile the driver as a usercmodule for your micropython plattform.
 
+For compile instruction see: 
+- https://github.com/gampam2000/RM67162_Micropyton_SPI?tab=readme-ov-file#setup-micropython-build-environment-in-ubuntu-20042
+- https://github.com/micropython/micropython/tree/master/ports/esp32#building-the-firmware
+- https://docs.micropython.org/en/latest/develop/cmodules.html
 
 ```python
 
