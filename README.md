@@ -25,7 +25,7 @@ This display sets the backlight via SPI but for the driver to work you need to a
 I added a `brightness` function, this controls the displays brightness level. It accepts an integer between 0 (=off) to 100 (100% brightness).
 The driver is still called st7789, I will refactor it in the future.
 
-This driver supports all the features the [original](#Original Documentation) has. Please also read [Updates](#updates).
+This driver supports all the features the [original](#original-documentation) has. Please also read [Updates](#updates).
 
 ## How to use:
 
@@ -79,11 +79,11 @@ for i in range(-1,101):
 ```
 
 
-## Updates:
+## [Updates](#updates)
   - Added `brightness` function
   - Added RM67162 support
 
-# Original Documentation
+# [Original Documentation](#original-documentation)
 
   - Added an Option for you to use a static framebuffer for drawing. This can improve the performance in some cases (1 - 60%, i.e. repiditively bitmapping, drawing fucntions for a large area, etc.) at the cost of, as you expect, RAM. You can use it in the constructor like so:
     The buffer should not be used togather with the `buffer_size` option. If only the `buffer_size` option is used and this option is not enabled, you can not profit from the faster drawing functions. If this option is enabled, a buffer of size `display->height * display-> width * 2` Bytes will be allocated, hence `buffer_size` and its related `i2c_buffer` will not have any effects but eating more RAM. Sometimes, the display's resolution is too high, so if the `drawbuffer` allocation fails, you can also jump back to the `buffer_size` option. 
