@@ -1,7 +1,7 @@
 
 # RM67162 SPI Driver for MicroPython
 
-This driver is a modified version of [nspsck st7735s_WeAct_Studio_TFT_port driver](https://github.com/nspsck/st7735s_WeAct_Studio_TFT_port) All credits goes to him for his amazing drivers!
+This driver is a modified version of [nspsck st7735s_WeAct_Studio_TFT_port driver](https://github.com/nspsck/st7735s_WeAct_Studio_TFT_port). Which is again a modified version of [russhughes' st7789_mpy driver](https://github.com/russhughes/st7789_mpy/tree/master). All credits goes to russhughes for his amazing drivers and nspck for his support!
 
 I modified the driver to specifically support displays with RM67162 controllers that only have SPI connection. For RM67162 Displays with QSPI (quad SPI) check out this driver:[RM67162_Micropython_QSPI](https://github.com/nspsck/RM67162_Micropython_QSPI)
 
