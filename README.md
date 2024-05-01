@@ -5,43 +5,87 @@ This driver is a modified version of [nspsck st7735s_WeAct_Studio_TFT_port drive
 
 I modified the driver to specifically support displays with RM67162 controllers that only have SPI connection. For RM67162 Displays with QSPI (quad SPI) check out this driver:[RM67162_Micropython_QSPI](https://github.com/nspsck/RM67162_Micropython_QSPI)
 
-This display sets the backlight via SPI but for the driver to work you need to assing a random unused pin for backlight. The reverse_backlight option does therefore nothing.
-
-This driver supports all the features the original has. Please read [Updates](#updates).
-
-# Original Documentation:
-
-## Side note:
-- The st7735 display from WeAct Studio has a 132x162 st7735s controller, however, the displays resolution is 128x160, which leads to the result, that the visible drawing area is from top left (2, 1) to bottom right (129, 160) in x-th pixel. For example: `tft.pixel(2, 0)` shows nothing on the display, but it's registered in the controllers frame memory. `tft.pixel(2, 1)` light up the the most top left pixel. This is fixed using the custom rotation table, for that automatically to take effect, you still have to set the resolution to 132x162, but use it as a 128x160 display. This result the `tft.height()` and `tft.width()` yelds `160` and `128` respectively. Please keep that in Mind.
+So far I have only tested it on ESP32-S3 variants. I use the hardware SPI 2 for my project. 
 ```
-rotations = (
-    (0x00, 128, 160, 2, 1),
-    (0x60, 160, 128, 1, 2),
-    (0xc0, 128, 160, 2, 1),
-    (0xa0, 160, 128, 1, 2)
-)
+ESP32S3        -->    RM67162 SPI (in some displays this is refered as SPI 4 Wire)
+3V3            -->    VCC,VBAT
+GND            -->    GND
+mosi=Pin40     -->    DIN
+sck=Pin39      -->    CLK
+cs=Pin45       -->    CS
+dc=Pin46       -->    D/C
+reset=Pin42    -->    RST
+backlight=Pin47-->    Not connected (assign unused GPIO)
+
 ```
+
+This display sets the backlight via SPI but for the driver to work you need to assing a random unused pin for backlight. The `reverse_backlight` option does therefore nothing.
+
+I added a `brightness` function, this controls the displays brightness level. It accepts an integer between 0 (=off) to 100 (100% brightness).
+The driver is still called st7789, I will refactor it in the future.
+
+This driver supports all the features the [original](#Original Documentation) has. Please also read [Updates](#updates).
+
+## How to use:
+
+
+
+```python
+
+from machine import Pin, SPI
+import st7789
+import vga2_16x16 as font
+import time
+
+oled = st7789.ST7789(
+    SPI(2, baudrate=40000000, sck=Pin(39), mosi=Pin(40), miso=None),
+    240,
+    536,
+    reset=Pin(42, Pin.OUT),
+    cs=Pin(45, Pin.OUT),
+    dc=Pin(46, Pin.OUT),
+    backlight=Pin(47, Pin.OUT),
+    rotations=[(0x00, 240, 536, 0, 0), (0x60, 536, 240, 0, 0), (0xc0, 240, 536, 0, 0), (0xa0, 536, 240, 0, 0)],
+    rotation=1,
+    options=0,
+    inversion=False,
+    color_order=st7789.RGB,
+    use_drawbuffer=True,
+    )
+
+oled.init()
+oled.fill(st7789.YELLOW)
+
+text="Test OLED"
+length = len(text)
+
+oled.text(
+    font,
+    text,
+    0,
+    0,
+    st7789.BLACK,
+    st7789.RED)
+
+oled.fill_circle(400,60,50,st7789.MAGENTA)
+oled.fill_circle(400,60,20,st7789.BLACK)
+
+#Test brightness:
+for i in range(-1,101):
+    oled.brightness(i)
+    time.sleep_ms(200)
+
+```
+
 
 ## Updates:
-  - Added support for Micropython v1.22+
-  - Added an Option for you to use a static framebuffer for drawing. This can improve the performance in some cases (1 - 60%, i.e. repiditively bitmapping, drawing fucntions for a large area, etc.) at the cost of, as you expect, RAM. You can use it in the constructor like so:
-    ```python
-    st7789.ST7789(
-        SPI(1, baudrate=30000000, sck=Pin(36), mosi=Pin(35), miso=None),
-        132,
-        162,
-        reset=Pin(1, Pin.OUT),
-        cs=Pin(34, Pin.OUT),
-        dc=Pin(38, Pin.OUT),
-        backlight=Pin(6, Pin.OUT),
-        rotation=rotation,
-        options=options,
-        buffer_size= buffer_size, # The buffer_size relate to the i2cbuffer and has nothing to do with the drawbuffer.
-        use_drawbuffer=True) # False means to use the original version to draw
-    ```
-    The buffer should not be used togather with the `buffer_size` option. If only the `buffer_size` option is used and this option is not enabled, you can not profit from the faster drawing functions. If this option is enabled, a buffer of size `display->height * display-> width * 2` Bytes will be allocated, hence `buffer_size` and its related `i2c_buffer` will not have any effects but eating more RAM. Sometimes, the display's resolution is too high, so if the `drawbuffer` allocation fails, you can also jump back to the `buffer_size` option. 
+  - Added `brightness` function
+  - Added RM67162 support
 
-  - Now there is an option called `reversed_backlight`, if you set this to `True`, the "pull down displays" will work but the "pull up displays" won't, vice versa.
+# Original Documentation
+
+  - Added an Option for you to use a static framebuffer for drawing. This can improve the performance in some cases (1 - 60%, i.e. repiditively bitmapping, drawing fucntions for a large area, etc.) at the cost of, as you expect, RAM. You can use it in the constructor like so:
+    The buffer should not be used togather with the `buffer_size` option. If only the `buffer_size` option is used and this option is not enabled, you can not profit from the faster drawing functions. If this option is enabled, a buffer of size `display->height * display-> width * 2` Bytes will be allocated, hence `buffer_size` and its related `i2c_buffer` will not have any effects but eating more RAM. Sometimes, the display's resolution is too high, so if the `drawbuffer` allocation fails, you can also jump back to the `buffer_size` option. 
 
 ## Firmware-updates
 Note: all firwares are compiled with the most recent micropython build at the time, if you want another version of micropython, please build it yourself following the build instruction provided below.
