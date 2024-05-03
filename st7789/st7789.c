@@ -1303,6 +1303,8 @@ STATIC void set_rotation(st7789_ST7789_obj_t *self) {
     if (rotations == NULL) {
         if (self->display_width == 240 && self->display_height == 320) {
             rotations = ORIENTATIONS_240x320;
+	} else if (self->display_width == 240 && self->display_height == 536) {
+            rotations = ORIENTATIONS_240x536;	
         } else if (self->display_width == 170 && self->display_height == 320) {
             rotations = ORIENTATIONS_170x320;
         } else if (self->display_width == 240 && self->display_height == 240) {
@@ -1373,15 +1375,35 @@ STATIC mp_obj_t st7789_ST7789_vscrdef(size_t n_args, const mp_obj_t *args) {
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(st7789_ST7789_vscrdef_obj, 4, 4, st7789_ST7789_vscrdef);
 
-STATIC mp_obj_t st7789_ST7789_vscsad(mp_obj_t self_in, mp_obj_t vssa_in) {
-    st7789_ST7789_obj_t *self = MP_OBJ_TO_PTR(self_in);
-    mp_int_t vssa = mp_obj_get_int(vssa_in);
+STATIC mp_obj_t st7789_ST7789_vscsad(size_t n_args, const mp_obj_t *args_in) {
+    st7789_ST7789_obj_t *self = MP_OBJ_TO_PTR(args_in[0]);
+    mp_int_t vssa = mp_obj_get_int(args_in[1]);
+
+    if (n_args > 2) {
+        if (mp_obj_is_true(args_in[2])) {
+	    self->madctl
+            self->madctl_val |= (1 << 4);
+        } else {
+	    self->madctl
+            self->madctl_val &= ~(1 << 4);
+        }
+    } else {
+	self->madctl    
+        self->madctl_val &= ~(1 << 4);
+    }
+    write_cmd(
+        self,
+        ST7789_MADCTL,
+        (uint8_t[]) { self->madctl, },
+        2
+    );
 
     uint8_t buf[2] = {(vssa) >> 8, (vssa) & 0xFF};
     write_cmd(self, ST7789_VSCSAD, buf, 2);
 
     return mp_const_none;
 }
+
 STATIC MP_DEFINE_CONST_FUN_OBJ_2(st7789_ST7789_vscsad_obj, st7789_ST7789_vscsad);
 
 STATIC void custom_init(st7789_ST7789_obj_t *self) {
