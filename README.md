@@ -36,6 +36,8 @@ For compile instruction see:
 - https://github.com/micropython/micropython/tree/master/ports/esp32#building-the-firmware
 - https://docs.micropython.org/en/latest/develop/cmodules.html
 
+In general, the screen starts at 0 and goes to 535 x 239, that's a total resolution of 536 x 240. All drawing functions should be called with this in mind.
+
 ```python
 
 from machine import Pin, SPI
