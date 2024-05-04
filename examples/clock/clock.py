@@ -20,12 +20,23 @@ import gc
 import utime
 from machine import Pin, SPI, RTC
 import st7789
-import tft_config
 import pacifico40 as font
 
-
-tft = tft_config.config(1)
-
+tft = st7789.ST7789(
+    SPI(2, baudrate=80000000, sck=Pin(39), mosi=Pin(40), miso=None),
+    240,
+    536,
+    reset=Pin(42, Pin.OUT),
+    cs=Pin(45, Pin.OUT),
+    dc=Pin(46, Pin.OUT),
+    backlight=Pin(47, Pin.OUT),
+    rotations=[(0x00, 240, 536, 0, 0), (0x60, 536, 240, 0, 0), (0xc0, 240, 536, 0, 0), (0xa0, 536, 240, 0, 0)],
+    rotation=1,
+    options=0,
+    inversion=False,
+    color_order=st7789.RGB,
+    use_drawbuffer=True,
+    )
 
 rtc = RTC()
 background_lock = 0     # prevents background change while > 0
@@ -69,13 +80,13 @@ def hour_pressed(pin):
     global background_lock, rtc
     tm = rtc.datetime()
     rtc.init((tm[0], tm[1], tm[2], tm[3], tm[4], tm[5]+1, tm[6], tm[7]))
-    background_lock = 10
+    background_lock = 1
 
 def minute_pressed(pin):
     global background_lock, rtc
     tm = rtc.datetime()
     rtc.init((tm[0], tm[1], tm[2], tm[3], tm[4]+1, tm[5], tm[6], tm[7]))
-    background_lock = 10
+    background_lock = 1
 
 
 def main():
@@ -101,8 +112,8 @@ def main():
     time_color = st7789.WHITE
     last_time = "-----"
 
-    Button(pin=Pin(35, mode=Pin.IN, pull=Pin.PULL_UP), callback=hour_pressed)
-    Button(pin=Pin(0, mode=Pin.IN, pull=Pin.PULL_UP), callback=minute_pressed)
+    Button(pin=Pin(0, mode=Pin.IN, pull=Pin.PULL_UP), callback=hour_pressed)
+    Button(pin=Pin(35, mode=Pin.IN, pull=Pin.PULL_UP), callback=minute_pressed)
 
     while True:
 
@@ -116,8 +127,9 @@ def main():
             gc.collect()
 
             # draw the new background from the clock_{WIDTH}x{HEIGHT} directory
-            image_file = "clock_{}x{}/{}".format(tft.width(), tft.height(), image)
-            tft.jpg(image_file, 0, 0, st7789.SLOW)
+            # image_file = "clock_{}x{}/{}".format(tft.width(), tft.height(), image)
+            image_file = image
+            tft.jpg(image_file , 0, 0, st7789.SLOW)
 
             # calculate the starting column for each time digit
             digit_columns = [time_col + digit *
@@ -163,8 +175,8 @@ def main():
                 # digit 1 is the hour, change the background every hour
                 # digit 3 is the tens of the minute, change the background every 10 minutes
                 # digit 4 is the ones of the minute, change the background every minute
-                if digit == 4 and last_time[digit] != '-' and background_lock == 0:
-                    background_change = True
+                #if digit == 4 and last_time[digit] != '-' and background_lock == 0:
+                background_change = True
 
                 # draw the changed digit, don't fill to the right
                 # of the ':' because it is always the same width

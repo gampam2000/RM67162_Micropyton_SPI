@@ -1381,15 +1381,12 @@ STATIC mp_obj_t st7789_ST7789_vscsad(size_t n_args, const mp_obj_t *args_in) {
 
     if (n_args > 2) {
         if (mp_obj_is_true(args_in[2])) {
-	    self->madctl
-            self->madctl_val |= (1 << 4);
+	        self->madctl |= (1 << 4);
         } else {
-	    self->madctl
-            self->madctl_val &= ~(1 << 4);
+	        self->madctl &= ~(1 << 4);
         }
     } else {
-	self->madctl    
-        self->madctl_val &= ~(1 << 4);
+	    self->madctl &= ~(1 << 4);
     }
     write_cmd(
         self,
@@ -1404,7 +1401,7 @@ STATIC mp_obj_t st7789_ST7789_vscsad(size_t n_args, const mp_obj_t *args_in) {
     return mp_const_none;
 }
 
-STATIC MP_DEFINE_CONST_FUN_OBJ_2(st7789_ST7789_vscsad_obj, st7789_ST7789_vscsad);
+STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(st7789_ST7789_vscsad_obj, 2, 3, st7789_ST7789_vscsad);
 
 STATIC void custom_init(st7789_ST7789_obj_t *self) {
     size_t init_len;
