@@ -25,6 +25,8 @@ This display sets the backlight via SPI but for the driver to work you need to a
 I added a `brightness` function, this controls the displays brightness level. It accepts an integer between 0 (=off) to 100 (100% brightness).
 The driver is still called st7789, I will refactor it in the future.
 
+Hardware Scrolling is not supported by the RM67161 Chip. Therefore the functions `vscsad()` and `vscrdef()` do nothing.
+
 This driver supports all the features the [original](#original-documentation) has. Please also read [Updates](#updates).
 
 ## How to use:
